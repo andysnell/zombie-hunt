@@ -1,0 +1,48 @@
+version: '3'
+services:
+  app:
+    build:
+      context: ./docker/app
+      dockerfile: Dockerfile
+    container_name: zombie_hunt_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www:cached
+    depends_on:
+      - redis
+      - mysql
+
+  web:
+    image: nginx:alpine
+    container_name: zombie_hunt_web
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "8080:80"
+      - "4430:443"
+    volumes:
+      - ./:/var/www:cached
+      - ./docker/web/:/etc/nginx/conf.d/:cached
+
+  redis:
+    image: redis:latest
+    container_name: zombie_hunt_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./docker/cache/:/data:delegated
+
+  mysql:
+    image: mysql:latest
+    container_name: zombie_hunt_mysql
+    environment:
+      - "MYSQL_DATABASE=homestead"
+      - "MYSQL_USER=homestead"
+      - "MYSQL_PASSWORD=secret"
+      - "MYSQL_ROOT_PASSWORD=secret"
+    ports:
+      - "33061:3306"
+    volumes:
+      - ./docker/database:/var/lib/mysql:cached
