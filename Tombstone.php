@@ -4,7 +4,7 @@ namespace App\Service;
 
 class Tombstone
 {
-    public static function bury(): void
+    public static function exhume(): void
     {
         $backtrace = debug_backtrace();
 
@@ -14,9 +14,9 @@ class Tombstone
 
         $tombstone = str_replace('\\', '_', $method);
 
-        $graveyard = storage_path('app/graveyard/');
+        $graveyard = __DIR__ . '/path/to/graveyard/';
 
-        if (!is_dir($graveyard) && !mkdir($graveyard, 0777, true)) {
+        if (!is_dir($graveyard) && !mkdir($graveyard, 0644, true)) {
             throw new \Exception('failed to create graveyard');
         }
 
